@@ -16,6 +16,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,10 +57,10 @@ public class DrillDownChartsView extends VerticalLayout {
            setId(newId);
            return newId;
         });
-        return String.format("function(event, chartContext, config) { "
+        return String.format("function(event, chartContext, config, globals) { "
                 + "var element = document.getElementById(\"%s\"); "
-                + "console.log(chartContext.w.config);"
-                + "element.$server.drillDown(chartContext.w.config.xaxis.categories[config.dataPointIndex]);"
+                + "console.log(chartContext.w);"
+                + "element.$server.drillDown(chartContext.w.globals.categoryLabels[config.dataPointIndex]);"
                 + " }", id
         );
     }
@@ -94,15 +95,20 @@ public class DrillDownChartsView extends VerticalLayout {
 
     @ClientCallable
     private void drillDown(String category) {
+        System.out.println("Category: " + category);
         Double[] drillDownValues = drillDownData.get(category);
         String[] subCategoryNames = subCategories.get(category);
+        System.out.println("SubCategories: " + Arrays.toString(subCategoryNames));
 
         if (drillDownValues != null &&subCategoryNames != null) {
             remove(apexChart);
+            System.out.println("Drilling down");
             apexChart = createApexCharts(subCategoryNames, drillDownValues, category + " Sales");
             backButton.setVisible(true);
             add(apexChart);
         }
+
+        System.out.println();
     }
 
     private void resetChart() {
