@@ -5,6 +5,7 @@ import com.github.appreciated.apexcharts.config.States;
 import com.github.appreciated.apexcharts.config.builder.*;
 import com.github.appreciated.apexcharts.config.chart.Type;
 import com.github.appreciated.apexcharts.config.chart.builder.EventsBuilder;
+import com.github.appreciated.apexcharts.config.xaxis.TickPlacement;
 import com.github.appreciated.apexcharts.helper.Series;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
@@ -81,7 +82,7 @@ public class DrillDownChartsView extends VerticalLayout {
                 .build());
 
         chart.setStates(new States());
-        chart.setXaxis(XAxisBuilder.get().withCategories(categories).build());
+        chart.setXaxis(XAxisBuilder.get().withCategories(categories).withTickPlacement(TickPlacement.ON).build());
         chart.setSeries(new Series<>("Sales", data));
         chart.setTitle(TitleSubtitleBuilder.get().withText(title).build());
 
