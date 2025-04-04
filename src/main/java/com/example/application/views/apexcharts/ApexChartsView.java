@@ -13,20 +13,21 @@ import com.github.appreciated.apexcharts.config.chart.Zoom;
 import com.github.appreciated.apexcharts.config.chart.builder.EventsBuilder;
 import com.github.appreciated.apexcharts.config.chart.builder.SelectionBuilder;
 import com.github.appreciated.apexcharts.config.chart.builder.ToolbarBuilder;
-import com.github.appreciated.apexcharts.config.chart.builder.ZoomBuilder;
 import com.github.appreciated.apexcharts.config.chart.selection.builder.XaxisBuilder;
 import com.github.appreciated.apexcharts.config.chart.toolbar.AutoSelected;
 import com.github.appreciated.apexcharts.config.chart.toolbar.Tools;
-import com.github.appreciated.apexcharts.config.chart.toolbar.builder.ToolsBuilder;
+import com.github.appreciated.apexcharts.config.chart.toolbar.builder.CsvBuilder;
+import com.github.appreciated.apexcharts.config.chart.toolbar.builder.ExportBuilder;
+import com.github.appreciated.apexcharts.config.chart.toolbar.builder.PngBuilder;
+import com.github.appreciated.apexcharts.config.chart.toolbar.builder.SvgBuilder;
 import com.github.appreciated.apexcharts.config.chart.zoom.ZoomType;
 import com.github.appreciated.apexcharts.config.legend.Position;
 import com.github.appreciated.apexcharts.config.subtitle.Align;
 import com.github.appreciated.apexcharts.config.xaxis.TickPlacement;
-import com.github.appreciated.apexcharts.config.xaxis.Title;
 import com.github.appreciated.apexcharts.config.xaxis.XAxisType;
+import com.github.appreciated.apexcharts.config.xaxis.builder.LabelsBuilder;
 import com.github.appreciated.apexcharts.config.xaxis.builder.TitleBuilder;
-import com.github.appreciated.apexcharts.helper.Coordinate;
-import com.github.appreciated.apexcharts.helper.Series;
+import com.github.appreciated.apexcharts.helper.*;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -97,31 +98,65 @@ public class ApexChartsView extends VerticalLayout {
                         "console.log('Clicked category: ', category);" +
                         "}").build())
                 .withZoom(zoom)
+                .withToolbar(ToolbarBuilder.get()
+                        .withExport(ExportBuilder.get()
+                                .withSvg(SvgBuilder.get()
+                                        .withFilename("Apex Bar-Chart.svg")
+                                        .build())
+                                .withPng(PngBuilder.get()
+                                        .withFilename("Apex Bar-Chart")
+                                        .build())
+                                .withCsv(CsvBuilder.get()
+                                        .withFilename("Apex Bar-Chart")
+                                        .build())
+                                .build())
+                        .build())
                 .build());
 
-        barChart.setXaxis(XAxisBuilder.get().withCategories("South Korea", "Canada", "United Kingdom", "Netherlands", "United States", "China")
+        barChart.setXaxis(XAxisBuilder.get().withCategories("2024-08-01", "2024-08-08", "2024-08-15", "2024-08-01", "2024-08-08", "2024-08-15")
+                        .withLabels(LabelsBuilder.get().withFormatter("function(value) { " +
+                                "return new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); " +
+                                "}").build())
                 .withTickPlacement(TickPlacement.ON)
                 .build());
-        barChart.setSeries(new Series<>("Population", 400, 430, 448, 470, 1100, 1500));
-        barChart.setDataLabels(DataLabelsBuilder.get().withEnabled(true).build());
+
+        barChart.setXaxis(XAxisBuilder.get().withCategories("2024-08-02", "2024-08-08", "2024-08-15", "2024-08-01", "2024-08-08")
+                .withLabels(LabelsBuilder.get().withFormatter("function(value) { " +
+                        "return new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); " +
+                        "}").build())
+                .withTickPlacement(TickPlacement.ON)
+                .build());
+
+//        barChart.up
+
+        barChart.setSeries(new Series<>("Population", 96631186.0520000100, 96631186.0520000100, 96631186.0520000100, 96631186.0520000100, 96631186.0520000100, 96631186.0520000100));
+
+        barChart.setSeries(new Series<>("Population", 80631186.0520000100, 96631186.0520000100, 96631186.0520000100, 96631186.0520000100, 96631186.0520000100));
+
+        YAxis yAxis2 = new YAxis();
+        yAxis2.setLabels(com.github.appreciated.apexcharts.config.yaxis.builder.LabelsBuilder.get()
+                .withFormatter("function(value) { return '$' + value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }")
+                .build());
+        barChart.setYaxis(new YAxis[]{yAxis2});
+
+        barChart.setDataLabels(DataLabelsBuilder.get().withEnabled(false).build());
 
         barChart.setHeight(400, Unit.PIXELS);
+        barChart.setColors("#4169E1");
 
         TitleSubtitle barTitle = new TitleSubtitle();
         barTitle.setText("Apex Bar Chart");
         barTitle.setAlign(Align.CENTER);
         barChart.setTitle(barTitle);
 
-
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.add(lineChart, barChart);
         horizontalLayout.setWidthFull();
 
+
+
         Toolbar toolbar = new Toolbar();
         Tools tools = new Tools();
-//        tools.setZoom("Zoom");
-//        tools.setZoomin("Zoom In");
-//        tools.setZoomout("Zoom Out");
 
         toolbar.setTools(tools);
         toolbar.setShow(true);
@@ -168,10 +203,12 @@ public class ApexChartsView extends VerticalLayout {
         barChart2.setSeries(new Series<>("Population", populationData), new Series<>("Senior Citizens", seniorCitizens));
         barChart2.setLegend(LegendBuilder.get().withPosition(Position.TOP).build());
         barChart2.setTitle(TitleSubtitleBuilder.get().withText("Population & Senior citizens of "+countries.length+" countries").build());
-        barChart2.setDataLabels(DataLabelsBuilder.get().withEnabled(false).build());
+        barChart2.setDataLabels(DataLabelsBuilder.get().withEnabled(false)
+                .withFormatter("function(value) { return '$' + value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }")
+                .build());
 
         barChart2.setHeight(500, Unit.PIXELS);
-//      barChart2.setWidth(50, Unit.PERCENTAGE);
+        barChart2.setColors("#87CEEB", "#9FE2BF");
 
         ApexCharts lineChart2 = new ApexCharts();
         lineChart2.setChart(ChartBuilder.get().withType(Type.LINE).build());
@@ -229,7 +266,11 @@ public class ApexChartsView extends VerticalLayout {
                 new Coordinate<>(getISOString(1538811000000L), new BigDecimal("6623.48"), new BigDecimal("6627"), new BigDecimal("6618.38"), new BigDecimal("6620.35")),
                 new Coordinate<>(getISOString(1538812800000L), new BigDecimal("6619.43"), new BigDecimal("6620.35"), new BigDecimal("6610.05"), new BigDecimal("6615.53"))
         ));
-        candleStickChart.setXaxis(XAxisBuilder.get().withType(XAxisType.DATETIME).build());
+        candleStickChart.setXaxis(XAxisBuilder.get().withType(XAxisType.DATETIME)
+                        .withLabels(LabelsBuilder.get().withFormatter("function(value) { " +
+                                "return new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); " +
+                                "}").build())
+                .build());
 
         candleStickChart.setHeight(500, Unit.PIXELS);
         candleStickChart.setWidth(90, Unit.PERCENTAGE);
