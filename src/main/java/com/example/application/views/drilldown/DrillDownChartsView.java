@@ -24,7 +24,7 @@ import java.util.Map;
 @Route("drill-charts")
 @Menu(order = 2, icon = LineAwesomeIconUrl.REACT)
 public class DrillDownChartsView extends VerticalLayout {
-    private ApexCharts apexChart;
+    private ApexCharts apexChart = new ApexCharts();
     private final Button backButton;
 
     private final Map<String, Double[]> drillDownData = new HashMap<>();
@@ -43,12 +43,12 @@ public class DrillDownChartsView extends VerticalLayout {
         subCategories.put("Clothing", new String[]{"Shirts", "Jeans", "Jackets"});
         subCategories.put("Groceries", new String[]{"Vegetables", "Snacks", "Beverages"});
 
-        apexChart = createApexCharts(categories, salesData, title, true);
+        createApexCharts(categories, salesData, title, true);
 
         backButton = new Button("Back", e ->resetChart());
         backButton.setVisible(false);
 
-        add(apexChart, backButton);
+        add(backButton, apexChart);
     }
 
     private String getCategory() {
@@ -66,31 +66,29 @@ public class DrillDownChartsView extends VerticalLayout {
     }
 
     private ApexCharts createApexCharts(String[] categories, Double[] data, String title, Boolean horizontal) {
-        ApexCharts chart = new ApexCharts();
-
         String chartId = "my-chart";
-        chart.getElement().setAttribute("id", chartId);
+        apexChart.getElement().setAttribute("id", chartId);
 
-        chart.setChart(ChartBuilder.get()
+        apexChart.setChart(ChartBuilder.get()
                 .withType(Type.BAR)
                 .withEvents(EventsBuilder.get().withClick(getCategory())
                         .build())
                 .build());
 
-        chart.setPlotOptions(PlotOptionsBuilder.get()
+        apexChart.setPlotOptions(PlotOptionsBuilder.get()
                 .withBar(BarBuilder.get()
                         .withHorizontal(horizontal)
                         .build())
                 .build());
 
-        chart.setXaxis(XAxisBuilder.get().withCategories(categories).withTickPlacement(TickPlacement.ON).build());
-        chart.setSeries(new Series<>("Sales", data));
-        chart.setTitle(TitleSubtitleBuilder.get().withText(title).build());
+        apexChart.setXaxis(XAxisBuilder.get().withCategories(categories).withTickPlacement(TickPlacement.ON).build());
+        apexChart.setSeries(new Series<>("Sales", data));
+        apexChart.setTitle(TitleSubtitleBuilder.get().withText(title).build());
 
-        chart.setDataLabels(DataLabelsBuilder.get().withEnabled(true).build());
-        chart.setHeight(400, Unit.PIXELS);
+        apexChart.setDataLabels(DataLabelsBuilder.get().withEnabled(true).build());
+        apexChart.setHeight(400, Unit.PIXELS);
 
-        return chart;
+        return apexChart;
     }
 
     @ClientCallable
@@ -101,22 +99,20 @@ public class DrillDownChartsView extends VerticalLayout {
         System.out.println("SubCategories: " + Arrays.toString(subCategoryNames));
 
         if (drillDownValues != null &&subCategoryNames != null) {
-            remove(apexChart);
             System.out.println("Drilling down");
             apexChart = createApexCharts(subCategoryNames, drillDownValues, category + " Sales", false);
+            apexChart.updateConfig();
             backButton.setVisible(true);
-            add(apexChart);
         }
 
         System.out.println();
     }
 
     private void resetChart() {
-        remove(apexChart);
         String[] categories = {"Electronics", "Clothing", "Groceries"};
         Double[] salesData = {5000.0, 3000.0, 7000.0};
-        apexChart = createApexCharts(categories, salesData, "Category Sales", true);
+        createApexCharts(categories, salesData, "Category Sales", true);
+        apexChart.updateConfig();
         backButton.setVisible(false);
-        add(apexChart);
     }
 }
