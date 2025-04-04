@@ -1,1 +1,14 @@
 @import url('./main-layout.css');
+
+.text-button {
+    background: transparent;
+    border: none;
+    font-weight: normal;
+    color: black;
+    cursor: pointer;
+}
+
+.text-button:hover {
+    background: none !important;
+    border: none;
+}
