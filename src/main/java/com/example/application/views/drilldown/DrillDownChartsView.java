@@ -43,7 +43,7 @@ public class DrillDownChartsView extends VerticalLayout {
         subCategories.put("Clothing", new String[]{"Shirts", "Jeans", "Jackets"});
         subCategories.put("Groceries", new String[]{"Vegetables", "Snacks", "Beverages"});
 
-        createApexCharts(categories, salesData, title, true);
+        createApexCharts(categories, salesData, title, false);
 
         backButton = new Button("Back", e ->resetChart());
         backButton.setVisible(false);
@@ -60,7 +60,7 @@ public class DrillDownChartsView extends VerticalLayout {
         return String.format("function(event, chartContext, config, globals) { "
                 + "var element = document.getElementById(\"%s\"); "
                 + "console.log(chartContext.w);"
-                + "element.$server.drillDown(chartContext.w.globals.labels[config.dataPointIndex]);"
+                + "element.$server.drillDown(chartContext.w.globals.categoryLabels[config.dataPointIndex]);"
                 + " }", id
         );
     }
@@ -111,7 +111,7 @@ public class DrillDownChartsView extends VerticalLayout {
     private void resetChart() {
         String[] categories = {"Electronics", "Clothing", "Groceries"};
         Double[] salesData = {5000.0, 3000.0, 7000.0};
-        createApexCharts(categories, salesData, "Category Sales", true);
+        createApexCharts(categories, salesData, "Category Sales", false);
         apexChart.updateConfig();
         backButton.setVisible(false);
     }
