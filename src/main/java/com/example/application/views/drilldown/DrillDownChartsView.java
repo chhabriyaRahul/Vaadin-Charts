@@ -1,10 +1,10 @@
 package com.example.application.views.drilldown;
 
 import com.github.appreciated.apexcharts.ApexCharts;
-import com.github.appreciated.apexcharts.config.States;
 import com.github.appreciated.apexcharts.config.builder.*;
 import com.github.appreciated.apexcharts.config.chart.Type;
 import com.github.appreciated.apexcharts.config.chart.builder.EventsBuilder;
+import com.github.appreciated.apexcharts.config.plotoptions.builder.BarBuilder;
 import com.github.appreciated.apexcharts.config.xaxis.TickPlacement;
 import com.github.appreciated.apexcharts.helper.Series;
 import com.vaadin.flow.component.Unit;
@@ -43,7 +43,7 @@ public class DrillDownChartsView extends VerticalLayout {
         subCategories.put("Clothing", new String[]{"Shirts", "Jeans", "Jackets"});
         subCategories.put("Groceries", new String[]{"Vegetables", "Snacks", "Beverages"});
 
-        apexChart = createApexCharts(categories, salesData, title);
+        apexChart = createApexCharts(categories, salesData, title, true);
 
         backButton = new Button("Back", e ->resetChart());
         backButton.setVisible(false);
@@ -60,12 +60,12 @@ public class DrillDownChartsView extends VerticalLayout {
         return String.format("function(event, chartContext, config, globals) { "
                 + "var element = document.getElementById(\"%s\"); "
                 + "console.log(chartContext.w);"
-                + "element.$server.drillDown(chartContext.w.globals.categoryLabels[config.dataPointIndex]);"
+                + "element.$server.drillDown(chartContext.w.globals.labels[config.dataPointIndex]);"
                 + " }", id
         );
     }
 
-    private ApexCharts createApexCharts(String[] categories, Double[] data, String title) {
+    private ApexCharts createApexCharts(String[] categories, Double[] data, String title, Boolean horizontal) {
         ApexCharts chart = new ApexCharts();
 
         String chartId = "my-chart";
@@ -73,16 +73,16 @@ public class DrillDownChartsView extends VerticalLayout {
 
         chart.setChart(ChartBuilder.get()
                 .withType(Type.BAR)
-//                        .withEvents(EventsBuilder.get().withClick("function(event, chartContext, seriesIndex) {" +
-//                                "const category = chartContext.w.config.xaxis.categories[seriesIndex.dataPointIndex];" +
-//                                "console.log('Clicked category: ', category);" +
-//                                "var element = document.getElementById('my-chart'); " +
-//                                "element.$server.drillDown(category);" +
-//                                "}").build())
-                        .withEvents(EventsBuilder.get().withClick(getCategory()).build())
+                .withEvents(EventsBuilder.get().withClick(getCategory())
+                        .build())
                 .build());
 
-        chart.setStates(new States());
+        chart.setPlotOptions(PlotOptionsBuilder.get()
+                .withBar(BarBuilder.get()
+                        .withHorizontal(horizontal)
+                        .build())
+                .build());
+
         chart.setXaxis(XAxisBuilder.get().withCategories(categories).withTickPlacement(TickPlacement.ON).build());
         chart.setSeries(new Series<>("Sales", data));
         chart.setTitle(TitleSubtitleBuilder.get().withText(title).build());
@@ -103,7 +103,7 @@ public class DrillDownChartsView extends VerticalLayout {
         if (drillDownValues != null &&subCategoryNames != null) {
             remove(apexChart);
             System.out.println("Drilling down");
-            apexChart = createApexCharts(subCategoryNames, drillDownValues, category + " Sales");
+            apexChart = createApexCharts(subCategoryNames, drillDownValues, category + " Sales", false);
             backButton.setVisible(true);
             add(apexChart);
         }
@@ -115,7 +115,7 @@ public class DrillDownChartsView extends VerticalLayout {
         remove(apexChart);
         String[] categories = {"Electronics", "Clothing", "Groceries"};
         Double[] salesData = {5000.0, 3000.0, 7000.0};
-        apexChart = createApexCharts(categories, salesData, "Category Sales");
+        apexChart = createApexCharts(categories, salesData, "Category Sales", true);
         backButton.setVisible(false);
         add(apexChart);
     }
